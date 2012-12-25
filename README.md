@@ -1,4 +1,4 @@
-Competitive-Test
+Competitive Test
 ================
 
-Student competitive grading system
+Students competitive grading system.
