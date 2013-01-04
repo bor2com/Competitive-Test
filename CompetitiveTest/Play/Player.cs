@@ -10,11 +10,11 @@
 
         #region Fields
 
-        private String status;
+        private String status = "Select program";
 
         private readonly ObservableCollection<LogRecord> log = new ObservableCollection<LogRecord>();
 
-        private readonly Communicator communicator;
+        private Communicator communicator = null;
 
         #endregion
 
@@ -26,20 +26,34 @@
             get {
                 return status;
             }
-            set {
+            private set {
                 status = value;
                 RaisePropertyChanged("Status");
             }
         }
+        
+        public Boolean IsReady { get; private set; }
+
+        public String Path {
+            set {
+                try {
+                    communicator = new Communicator(value);
+                    IsReady = true;
+                    Status = "Ready";
+                    RaisePropertyChanged("Name");
+                } catch (Exception ex) {
+                    communicator = null;
+                    IsReady = false;
+                    Status = "Select program";
+                }
+            }
+        }
+
+        public ObservableCollection<LogRecord> Log { get { return log; } }
 
         #endregion
 
         #region Methods
-
-        public Player(String executablePath) {
-            communicator = new Communicator(executablePath);
-            status = "Ready";
-        }
 
         /// <summary>
         /// Runs the report of 
@@ -54,9 +68,12 @@
                 RunOutcome ro = communicator.Run(input, timeLimit);
                 record = new LogRecord(ro.Output, RecordClass.Description, ro.Elapsed, ro.TimeStamp);
             } catch (RuntimeErrorException ex) {
-                record = new LogRecord(String.Format("RE {0}", ex.ErrorCode), RecordClass.Error, null, DateTime.Now);
+                record = LogRecord.Error(String.Format("RE {0}", ex.ErrorCode));
             } catch (TimeLimitException) {
-                record = new LogRecord("TL", RecordClass.Error, timeLimit, DateTime.Now);
+                record = LogRecord.Error("TL");
+            } catch (Exception) {
+                record = LogRecord.Error("Communicator has failed");
+                Path = null;
             }
             log.Add(record);
             return record;

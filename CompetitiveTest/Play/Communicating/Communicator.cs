@@ -43,7 +43,7 @@
         /// <param name="executablePath">Path to console application's executable</param>
         /// <exception cref="ArgumentException">The executable doesn't exist or the format is not supported</exception>
         public Communicator(String executablePath) {
-            if (File.Exists(executablePath) && executablePath.ToLower().EndsWith(".exe")) {
+            if (!(File.Exists(executablePath) && executablePath.ToLower().EndsWith(".exe"))) {
                 throw new ArgumentException("The executable either doesn\'t exist or has not supported format", "executablePath");
             }
             this.executablePath = executablePath;

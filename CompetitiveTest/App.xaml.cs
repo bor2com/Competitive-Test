@@ -6,7 +6,7 @@
 
         public App() : base() {
             this.Dispatcher.UnhandledException += (esnder, e) => {
-                MessageBox.Show("Вибачте, але у програмі виникла помилка. Будь-ласка напишіть на dibrov.bor@gmail.com яким чином це сталося.", "Помилка виконання :(", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Unknown error :(");
                 e.Handled = true;
             };
         }

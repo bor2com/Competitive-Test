@@ -4,6 +4,12 @@
 
     public abstract class Game {
 
+        #region Fields
+
+        protected static Random rnd = new Random();
+
+        #endregion
+
         #region Properties
 
         public abstract String Name { get; }
@@ -38,10 +44,10 @@
             if (maxSteps <= 0) {
                 throw new ArgumentException(String.Format("The argument must be a positive integer, passed {0}", maxSteps), "maxSteps");
             }
-            return BeginPlay(players, maxSteps, timeLimit);
+            return ActualPlay(players, maxSteps, timeLimit);
         }
 
-        protected abstract Player BeginPlay(Player[] players, Int32 maxSteps, TimeSpan timeLimit);
+        protected abstract Player ActualPlay(Player[] players, Int32 maxSteps, TimeSpan timeLimit);
 
         #endregion
 
