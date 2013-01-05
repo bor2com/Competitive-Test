@@ -1,39 +1,39 @@
 ﻿namespace SSU.CompetitiveTest.Play.Communicating {
 
-    using System;
+  using System;
 
-    public sealed class RunOutcome {
+  public sealed class RunOutcome {
 
-        #region Fields
+    #region Fields
 
-        private readonly String output;
+    private readonly String output;
 
-        private readonly TimeSpan elapsed;
+    private readonly TimeSpan elapsed;
 
-        private readonly DateTime timeStamp;
+    private readonly DateTime timeStamp;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public String Output { get { return output; } }
+    public String Output { get { return output; } }
 
-        public TimeSpan Elapsed { get { return elapsed; } }
+    public TimeSpan Elapsed { get { return elapsed; } }
 
-        public DateTime TimeStamp { get { return timeStamp; } }
+    public DateTime TimeStamp { get { return timeStamp; } }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public RunOutcome(String output, TimeSpan elapsed, DateTime timeStamp) {
-            this.output = output;
-            this.elapsed = elapsed;
-            this.timeStamp = timeStamp;
-        }
-
-        #endregion
-
+    public RunOutcome(String output, TimeSpan elapsed, DateTime timeStamp) {
+      this.output = output;
+      this.elapsed = elapsed;
+      this.timeStamp = timeStamp;
     }
+
+    #endregion
+
+  }
 
 }

@@ -1,30 +1,30 @@
 ﻿namespace SSU.CompetitiveTest.Play.Communicating {
 
-    using System;
+  using System;
 
-    [global::System.Serializable]
-    public sealed class RuntimeErrorException : Exception {
+  [global::System.Serializable]
+  public sealed class RuntimeErrorException : Exception {
 
-        #region Fields
+    #region Fields
 
-        private readonly Int32 errorCode;
+    private readonly Int32 errorCode;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public Int32 ErrorCode { get { return errorCode; } }
+    public Int32 ErrorCode { get { return errorCode; } }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public RuntimeErrorException(Int32 errorCode) { this.errorCode = errorCode; }
-        public RuntimeErrorException(Int32 errorCode, String message) : this(errorCode, message, null) { }
-        public RuntimeErrorException(Int32 errorCode, String message, Exception inner) : base(message, inner) { this.errorCode = errorCode; }
+    public RuntimeErrorException(Int32 errorCode) { this.errorCode = errorCode; }
+    public RuntimeErrorException(Int32 errorCode, String message) : this(errorCode, message, null) { }
+    public RuntimeErrorException(Int32 errorCode, String message, Exception inner) : base(message, inner) { this.errorCode = errorCode; }
 
-        #endregion
+    #endregion
 
-    }
+  }
 
 }

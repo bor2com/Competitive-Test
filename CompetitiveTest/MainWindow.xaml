@@ -4,5 +4,5 @@
         xmlns:local="clr-namespace:SSU.CompetitiveTest.Play"
         WindowStartupLocation="CenterScreen"
         Title="Gaming platform" Height="415.319" Width="672">
-    <local:GameUI/>
+  <local:GameUI/>
 </Window>

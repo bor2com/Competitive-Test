@@ -1,48 +1,48 @@
 ﻿namespace SSU.CompetitiveTest.Play.Logging {
 
-    using System;
+  using System;
 
-    public sealed class LogRecord {
+  public sealed class LogRecord {
 
-        #region Fields
+    #region Fields
 
-        private readonly String message;
+    private readonly String message;
 
-        private readonly RecordClass recordClass;
+    private readonly RecordClass recordClass;
 
-        private readonly TimeSpan? runningTime;
+    private readonly TimeSpan? runningTime;
 
-        private readonly DateTime timeStamp;
+    private readonly DateTime timeStamp;
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        public String Message { get { return message; } }
+    public String Message { get { return message; } }
 
-        public RecordClass RecordClass { get { return recordClass; } }
+    public RecordClass RecordClass { get { return recordClass; } }
 
-        public TimeSpan? RunningTime { get { return runningTime; } }
+    public TimeSpan? RunningTime { get { return runningTime; } }
 
-        public DateTime TimeStamp { get { return timeStamp; } }
+    public DateTime TimeStamp { get { return timeStamp; } }
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public static LogRecord Make(String message, RecordClass recordClass) {
-            return new LogRecord(message, recordClass, null, DateTime.Now);
-        }
-
-        public LogRecord(String message, RecordClass recordClass, TimeSpan? runningTime, DateTime timeStamp) {
-            this.message = message;
-            this.recordClass = recordClass;
-            this.runningTime = runningTime;
-            this.timeStamp = timeStamp;
-        }
-
-        #endregion
-
+    public static LogRecord Make(String message, RecordClass recordClass) {
+      return new LogRecord(message, recordClass, null, DateTime.Now);
     }
+
+    public LogRecord(String message, RecordClass recordClass, TimeSpan? runningTime, DateTime timeStamp) {
+      this.message = message;
+      this.recordClass = recordClass;
+      this.runningTime = runningTime;
+      this.timeStamp = timeStamp;
+    }
+
+    #endregion
+
+  }
 
 }

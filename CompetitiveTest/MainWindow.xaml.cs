@@ -1,13 +1,13 @@
-﻿using System.Windows;
+﻿namespace SSU.CompetitiveTest {
 
-namespace SSU.CompetitiveTest {
+  using System.Windows;
 
-    public partial class MainWindow : Window {
+  public partial class MainWindow : Window {
 
-        public MainWindow() {
-            InitializeComponent();
-        }
-
+    public MainWindow() {
+      InitializeComponent();
     }
+
+  }
 
 }

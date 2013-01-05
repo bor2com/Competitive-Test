@@ -1,19 +1,19 @@
 ﻿namespace SSU.CompetitiveTest.Play.Logging {
 
-    using System;
+  using System;
 
-    public enum RecordClass : byte {
+  public enum RecordClass : byte {
 
-        Error = 1,
+    Error = 1,
 
-        PlayerToJudge,
+    PlayerToJudge,
 
-        JudgeToPlayer,
+    JudgeToPlayer,
 
-        Notification,
+    Notification,
 
-        Congratulation
+    Congratulation
 
-    }
+  }
 
 }
