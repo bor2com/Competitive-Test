@@ -6,7 +6,9 @@
 
         Error = 1,
 
-        Description,
+        PlayerToJudge,
+
+        JudgeToPlayer,
 
         Notification,
 

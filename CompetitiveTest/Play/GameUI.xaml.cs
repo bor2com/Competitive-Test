@@ -3,15 +3,15 @@
     using System;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Input;
     using Microsoft.Win32;
-    using System.Collections.ObjectModel;
 
     public partial class GameUI : UserControl {
 
         #region Fields
 
         private Game currentGame;
+
+        private Player[] players;
 
         #endregion
 
@@ -23,7 +23,7 @@
 
         public Game CurrentGame { get { return currentGame; } }
 
-        public ObservableCollection<Player> Players { get; private set; }
+        public Player[] Players { get { return players; } }
 
         #endregion
 
@@ -34,10 +34,21 @@
             TimeLimitInput = "2.0";
             MaxStepsInput = "500";
             currentGame = new Games.GuessTheNumber();
-            Players = new ObservableCollection<Player>();
-            Players.Add(new Player());
-            Players.Add(new Player());
+            players = new Player[currentGame.Players];
+            for (Int32 i = 0; i < currentGame.Players; ++i) {
+                players[i] = new Player(Dispatcher);
+            }
             DataContext = this;
+        }
+
+        private Boolean CheckPlayers() {
+            foreach (Player p in players) {
+                if (p == null || !p.IsReady) {
+                    playButton.IsEnabled = false;
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void selectPlayerHandler(Object sender, RoutedEventArgs e) {
@@ -48,14 +59,19 @@
                 Int32 selected = Math.Max(playerList.SelectedIndex, 0), cnt, n = currentGame.Players, i;
                 if (n > 0) {
                     for (cnt = i = 0; cnt < n && i < dlg.FileNames.Length; ++cnt, ++i) {
-                        Players[(selected + i) % n].Path = dlg.FileNames[i];
+                        players[(selected + i) % n].Path = dlg.FileNames[i];
                     }
                 }
             }
+            playButton.IsEnabled = CheckPlayers();
         }
 
         private void playHandler(Object sender, RoutedEventArgs e) {
-
+            if (CheckPlayers()) {
+                CurrentGame.BeginPlay(players, 500, TimeSpan.FromSeconds(2.0));
+            } else {
+                playButton.IsEnabled = false;
+            }
         }
 
         #endregion

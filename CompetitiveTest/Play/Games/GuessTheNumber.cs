@@ -44,7 +44,7 @@
             for (i = 0; i < Players; ++i) {
                 pinfo[i].From = from;
                 pinfo[i].To = to;
-                players[i].Log.Add(LogRecord.Notification("Beginning of the game"));
+                players[i].AddAsyncRecord(LogRecord.Make("Beginning of the game", RecordClass.Notification));
             }
             Int32 answer, done = 0, active = Players;
             Boolean draw;
@@ -53,8 +53,9 @@
                     if (!pinfo[i].OutOfGame) {
                         ++active;
                         Debug.Assert(pinfo[i].From <= pinfo[i].To);
-                        LogRecord one = players[i].Turn(String.Format("{0} {1}", pinfo[i].From, pinfo[i].To), timeLimit);
-                        if (one.RecordClass == RecordClass.Description) {
+                        String passed = String.Format("{0} {1}", pinfo[i].From, pinfo[i].To);
+                        LogRecord one = players[i].Turn(passed, timeLimit);
+                        if (one.RecordClass == RecordClass.PlayerToJudge) {
                             if (Int32.TryParse(one.Message, out answer) && answer >= pinfo[i].From && answer <= pinfo[i].To) {
                                 if (answer == secret) {
                                     ++done;
@@ -68,11 +69,11 @@
                                 }
                             } else {
                                 pinfo[i].OutOfGame = true;
-                                players[i].Log.Add(LogRecord.Notification("Wrong output format"));
+                                players[i].AddAsyncRecord(LogRecord.Make("Wrong output format", RecordClass.Notification));
                             }
                         } else {
                             pinfo[i].OutOfGame = true;
-                            players[i].Log.Add(LogRecord.Notification("Out of the game"));
+                            players[i].AddAsyncRecord(LogRecord.Make("Out of the game", RecordClass.Notification));
                         }
                     }
                 }
@@ -83,13 +84,23 @@
                 for (i = 0; i < Players; ++i) {
                     if (pinfo[i].Done) {
                         last = i;
-                        players[i].Log.Add(LogRecord.Notification(draw ? "Draw" : "Winner!"));
+                        if (draw) {
+                            players[i].AddAsyncRecord(LogRecord.Make("Draw", RecordClass.Notification));
+                        } else {
+                            players[i].AddAsyncRecord(LogRecord.Make("Winner!", RecordClass.Congratulation));
+                        }
                     } else if (!pinfo[i].OutOfGame) {
-                        players[i].Log.Add(LogRecord.Notification("The game has been ended"));
+                        players[i].AddAsyncRecord(LogRecord.Make("The game has been ended", RecordClass.Notification));
                     }
                 }
                 if (!draw) {
                     return players[last];
+                }
+            } else {
+                for (i = 0; i < Players; ++i) {
+                    if (!pinfo[i].OutOfGame) {
+                        players[i].AddAsyncRecord(LogRecord.Make("Steps limit has been reached", RecordClass.Notification));
+                    }
                 }
             }
             return null;

@@ -1,12 +1,30 @@
 ﻿namespace SSU.CompetitiveTest.Play {
 
     using System;
+    using System.ComponentModel;
 
     public abstract class Game {
+
+        #region Class
+
+        private class GameInputData {
+            public readonly Player[] Players;
+            public readonly Int32 MaxSteps;
+            public readonly TimeSpan TimeLimit;
+            public GameInputData(Player[] players, Int32 maxSteps, TimeSpan timeLimit) {
+                Players = players;
+                MaxSteps = maxSteps;
+                TimeLimit = timeLimit;
+            }
+        }
+
+        #endregion
 
         #region Fields
 
         protected static Random rnd = new Random();
+
+        private BackgroundWorker worker = new BackgroundWorker();
 
         #endregion
 
@@ -25,16 +43,21 @@
 
         #region Methods
 
+        public Game() {
+            worker.DoWork += BackgroundWork;
+        }
+
+        
         /// <summary>
-        /// Run the game with specified players and settings.
+        /// Run the game asynchronously with specified players and settings. Afterwards writes either pointer to winner or null in case of a draw to the Result.
         /// </summary>
         /// <param name="players">Array of players</param>
         /// <param name="maxSteps">Game steps limit</param>
         /// <param name="timeLimit">Execution time limit for a single game step</param>
-        /// <returns>Player which wins the game or null in case of a draw</returns>
         /// <exception cref="ArgumentNullException">Neither <c>players</c> nor it's element can be null</exception>
         /// <exception cref="ArgumentException">The <c>players</c> element count should match <c>Players</c> and <c>maxSteps</c> must be a positive integer</exception>
-        public Player Play(Player[] players, Int32 maxSteps, TimeSpan timeLimit) {
+        /// <exception cref="InvalidOperationException">When the game already has been started</exception>
+        public void BeginPlay(Player[] players, Int32 maxSteps, TimeSpan timeLimit) {
             if (players == null || Array.IndexOf(players, null) >= 0) {
                 throw new ArgumentNullException("players", "The array and any element can\'t be null");
             }
@@ -44,7 +67,15 @@
             if (maxSteps <= 0) {
                 throw new ArgumentException(String.Format("The argument must be a positive integer, passed {0}", maxSteps), "maxSteps");
             }
-            return ActualPlay(players, maxSteps, timeLimit);
+            if (worker.IsBusy) {
+                throw new InvalidOperationException("The game is still in progress");
+            }
+            worker.RunWorkerAsync(new GameInputData(players, maxSteps, timeLimit));
+        }
+
+        private void BackgroundWork(Object sender, DoWorkEventArgs e) {
+            GameInputData data = e.Argument as GameInputData;
+            e.Result = ActualPlay(data.Players, data.MaxSteps, data.TimeLimit);
         }
 
         protected abstract Player ActualPlay(Player[] players, Int32 maxSteps, TimeSpan timeLimit);

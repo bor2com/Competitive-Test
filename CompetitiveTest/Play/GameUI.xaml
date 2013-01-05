@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SSU.CompetitiveTest.Play"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700">
     <UserControl.Resources>
@@ -39,36 +38,31 @@
                 </ListBox.ItemContainerStyle>
             </ListBox>
             <Button Click="selectPlayerHandler">Choose the player</Button>
-            <!--
-            <Button IsEnabled="{Binding IsReady}" Click="playHandler">Play!</Button>
+            <Button x:Name="playButton" Click="playHandler" IsEnabled="False">Play!</Button>
             <Button IsEnabled="False">Tournament</Button>
-            -->
         </StackPanel>
         <GroupBox Header="Log" Width="300">
             <ListView ItemsSource="{Binding ElementName=playerList, Path=SelectedItem.Log}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}">
+                        <TextBlock Text="{Binding Message}">
                             <TextBlock.Style>
                                 <Style>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="JudgeToPlayer">
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="JudgeToPlayer">
                                             <Setter Property="TextBlock.Foreground" Value="Gray" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="PlayerToJudge">
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="PlayerToJudge">
                                             <Setter Property="TextBlock.Foreground" Value="Black" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="PlayerCrush">
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Error">
                                             <Setter Property="TextBlock.Foreground" Value="Red" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="PlayerTimeOut">
-                                            <Setter Property="TextBlock.Foreground" Value="Red" />
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Notification">
+                                            <Setter Property="TextBlock.Foreground" Value="CornflowerBlue" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="PlayerWrongOutputFormat">
-                                            <Setter Property="TextBlock.Foreground" Value="Red" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Resolution}" Value="PlayerCorrectAnswer">
-                                            <Setter Property="TextBlock.Foreground" Value="Green" />
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Congratulation">
+                                            <Setter Property="TextBlock.Foreground" Value="DarkGoldenrod" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

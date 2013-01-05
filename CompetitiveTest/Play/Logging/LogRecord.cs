@@ -30,12 +30,8 @@
 
         #region Methods
 
-        public static LogRecord Notification(String message) {
-            return new LogRecord(message, RecordClass.Notification, null, DateTime.Now);
-        }
-
-        public static LogRecord Error(String message) {
-            return new LogRecord(message, RecordClass.Error, null, DateTime.Now);
+        public static LogRecord Make(String message, RecordClass recordClass) {
+            return new LogRecord(message, recordClass, null, DateTime.Now);
         }
 
         public LogRecord(String message, RecordClass recordClass, TimeSpan? runningTime, DateTime timeStamp) {

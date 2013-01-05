@@ -5,6 +5,8 @@
     using System.Collections.ObjectModel;
     using SSU.CompetitiveTest.Play.Logging;
     using SSU.CompetitiveTest.Play.Communicating;
+    using System.Windows.Threading;
+    using System.Threading;
 
     public sealed class Player : INotifyPropertyChanged {
 
@@ -13,6 +15,8 @@
         private String status = "Select program";
 
         private readonly ObservableCollection<LogRecord> log = new ObservableCollection<LogRecord>();
+
+        private readonly Dispatcher dispatcher;
 
         private Communicator communicator = null;
 
@@ -55,34 +59,47 @@
 
         #region Methods
 
+        public void AddAsyncRecord(LogRecord record) {
+            dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)(() => log.Add(record)));
+        }
+
+        public Player(Dispatcher dispatcher) {
+            this.dispatcher = dispatcher;
+        }
+
         /// <summary>
-        /// Runs the report of 
+        /// Makes a single turn utilizing the communicator and recording results
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="timeLimit"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="input">Input string</param>
+        /// <param name="timeLimit">Time limit</param>
+        /// <returns>Log record with the execution outcome</returns>
         public LogRecord Turn(String input, TimeSpan timeLimit) {
+            AddAsyncRecord(LogRecord.Make(input, RecordClass.JudgeToPlayer));
             LogRecord record;
             try {
                 RunOutcome ro = communicator.Run(input, timeLimit);
-                record = new LogRecord(ro.Output, RecordClass.Description, ro.Elapsed, ro.TimeStamp);
+                record = new LogRecord(ro.Output.Trim(), RecordClass.PlayerToJudge, ro.Elapsed, ro.TimeStamp);
+                Status = "OK";
             } catch (RuntimeErrorException ex) {
-                record = LogRecord.Error(String.Format("RE {0}", ex.ErrorCode));
+                record = LogRecord.Make(String.Format("Runtime Error #{0}", ex.ErrorCode), RecordClass.Error);
+                Status = "RE";
             } catch (TimeLimitException) {
-                record = LogRecord.Error("TL");
+                record = LogRecord.Make("Time Limit has been exceeded", RecordClass.Error);
+                Status = "TL";
             } catch (Exception) {
-                record = LogRecord.Error("Communicator has failed");
+                record = LogRecord.Make("Communication has failed", RecordClass.Error);
                 Path = null;
             }
-            log.Add(record);
+            AddAsyncRecord(record);
             return record;
         }
 
         private void RaisePropertyChanged(String pname) {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(pname));
-            }
+            dispatcher.BeginInvoke(DispatcherPriority.DataBind, (ThreadStart)delegate() {
+                if (PropertyChanged != null) {
+                    PropertyChanged(this, new PropertyChangedEventArgs(pname));
+                }
+            });
         }
 
         #endregion
