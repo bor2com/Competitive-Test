@@ -8,7 +8,9 @@
 
     Ready,
 
-    Running
+    Running,
+
+    Cancelling
 
   }
 

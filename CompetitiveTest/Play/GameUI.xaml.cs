@@ -38,29 +38,26 @@
         return state;
       }
       set {
-        if (state != value) {
-          switch (state = value) {
-            case GameState.Running:
-              ToggleButtonPressed = true;
-              break;
-            default :
-              ToggleButtonPressed = false;
-              break;
-          }
-          RaisePropertyChanged("State");
-        }
+        state = value;
+        RaisePropertyChanged("State");
+        RaisePropertyChanged("IsBusy");
       }
     }
 
-    public Boolean ToggleButtonPressed {
+    public Boolean IsBusy {
       get {
-        return toggleButtonPressed;
+        switch (state) {
+          case GameState.Running:
+          case GameState.Cancelling:
+            return true;
+          case GameState.Ready:
+          case GameState.SelectPlayers:
+            return false;
+          default:
+            throw new InvalidEnumArgumentException("Ununknown state");
+        }
       }
       set {
-        if (toggleButtonPressed != value) {
-          toggleButtonPressed = value;
-          RaisePropertyChanged("ToggleButtonPressed");
-        }
       }
     }
 
@@ -125,11 +122,13 @@
           if (state == GameState.Ready) {
             CurrentGame.BeginPlay(players, maxSteps, TimeSpan.FromSeconds(timeLimitSeconds));
             State = GameState.Running;
+            return;
           }
         }
+        State = GameState.Ready;
       } else {
         currentGame.CalcelPlay();
-        State = GameState.Ready;
+        State = GameState.Cancelling;
       }
     }
 

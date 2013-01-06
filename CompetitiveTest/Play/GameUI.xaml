@@ -38,13 +38,13 @@
                 </ListBox.ItemContainerStyle>
             </ListBox>
             <Button Click="selectPlayerHandler">Choose the player</Button>
-            <ToggleButton Width="200" Margin="1" Click="playHandler" IsChecked="{Binding Path=ToggleButtonPressed, Mode=OneWay}">
+            <ToggleButton Width="200" Margin="1" Click="playHandler" IsChecked="{Binding IsBusy}">
                 <ToggleButton.Style>
                     <Style>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding State}" Value="SelectPlayers">
                                 <Setter Property="ToggleButton.IsEnabled" Value="False" />
-                                <Setter Property="ToggleButton.Content" Value="Play!" />
+                                <Setter Property="ToggleButton.Content" Value="Select players..." />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding State}" Value="Ready">
                                 <Setter Property="ToggleButton.IsEnabled" Value="True" />
@@ -54,11 +54,14 @@
                                 <Setter Property="ToggleButton.IsEnabled" Value="True" />
                                 <Setter Property="ToggleButton.Content" Value="Cancel" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding State}" Value="Cancelling">
+                                <Setter Property="ToggleButton.IsEnabled" Value="False" />
+                                <Setter Property="ToggleButton.Content" Value="Cancelling..." />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </ToggleButton.Style>
             </ToggleButton>
-            <Button IsEnabled="False">Tournament</Button>
         </StackPanel>
         <GroupBox Header="Log" Width="300">
             <ListView ItemsSource="{Binding ElementName=playerList, Path=SelectedItem.Log}">
