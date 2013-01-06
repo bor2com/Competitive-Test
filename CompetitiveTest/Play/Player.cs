@@ -77,7 +77,7 @@
     /// <param name="timeLimit">Time limit</param>
     /// <returns>Log record with the execution outcome</returns>
     public LogRecord Turn(String input, TimeSpan timeLimit) {
-      AddRecord(LogRecord.Make(input, RecordClass.JudgeToPlayer));
+      AddRecord(LogRecord.Make(input.Trim(), RecordClass.JudgeToPlayer));
       LogRecord record;
       try {
         RunOutcome ro = communicator.Run(input, timeLimit);

@@ -24,7 +24,11 @@
 
     protected static Random rnd = new Random();
 
-    private BackgroundWorker worker = new BackgroundWorker();
+    private BackgroundWorker worker = new BackgroundWorker() {
+      WorkerSupportsCancellation = true
+    };
+
+    private Boolean cancellationPending;
 
     #endregion
 
@@ -39,14 +43,26 @@
     /// </summary>
     public abstract Int32 Players { get; }
 
+    protected Boolean CancellationPending {
+      get {
+        lock (this) {
+          return cancellationPending;
+        }
+      }
+      private set {
+        lock (this) {
+          cancellationPending = value;
+        }
+      }
+    }
+
     #endregion
 
     #region Methods
 
     public Game() {
-      worker.DoWork += BackgroundWork;
+      worker.DoWork += backgroundWork;
     }
-
 
     /// <summary>
     /// Run the game asynchronously with specified players and settings. Afterwards writes either pointer to winner or null in case of a draw to the Result.
@@ -71,14 +87,35 @@
         throw new InvalidOperationException("The game is still in progress");
       }
       worker.RunWorkerAsync(new GameInputData(players, maxSteps, timeLimit));
+      worker.CancelAsync();
     }
 
-    private void BackgroundWork(Object sender, DoWorkEventArgs e) {
+    public void CalcelPlay() {
+      if (worker.WorkerSupportsCancellation && worker.IsBusy) {
+        CancellationPending = true;
+      }
+    }
+
+    private void backgroundWork(Object sender, DoWorkEventArgs e) {
+      cancellationPending = false;
       GameInputData data = e.Argument as GameInputData;
       e.Result = ActualPlay(data.Players, data.MaxSteps, data.TimeLimit);
     }
 
     protected abstract Player ActualPlay(Player[] players, Int32 maxSteps, TimeSpan timeLimit);
+
+    #endregion
+
+    #region Events
+
+    public event RunWorkerCompletedEventHandler GameComplete {
+      add {
+        worker.RunWorkerCompleted += value;
+      }
+      remove {
+        worker.RunWorkerCompleted -= value;
+      }
+    }
 
     #endregion
 

@@ -5,72 +5,91 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700">
-  <UserControl.Resources>
-    <Style TargetType="Button">
-      <Setter Property="Width" Value="200"/>
-      <Setter Property="Margin" Value="1"/>
-    </Style>
-  </UserControl.Resources>
-  <StackPanel Orientation="Horizontal">
-    <StackPanel Width="350">
-      <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="20" Padding="10 10 10 0" DataContext="{Binding CurrentGame}"/>
-      <TextBlock Text="{Binding Description}"  Padding="10 10 10 5" TextWrapping="Wrap" DataContext="{Binding CurrentGame}"/>
-      <TextBlock Padding="10 0 10 5">Time Limit: <TextBox Text="{Binding TimeLimitInput}" Width="40"/> s</TextBlock>
-      <TextBlock Padding="10 0 10 5">Max Steps: <TextBox Text="{Binding MaxStepsInput}" Width="50"/></TextBlock>
-      <ListBox Name="playerList" ItemsSource="{Binding Players}">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <StackPanel>
-              <TextBlock Text="{Binding Name}"/>
-              <TextBlock Text="{Binding Status}"/>
-            </StackPanel>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-             <StackPanel Orientation="Horizontal" />
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemContainerStyle>
-          <Style TargetType="ListBoxItem">
-            <Setter Property="Padding" Value="30 0 30 0" />
-          </Style>
-        </ListBox.ItemContainerStyle>
-      </ListBox>
-      <Button Click="selectPlayerHandler">Choose the player</Button>
-      <Button x:Name="playButton" Click="playHandler" IsEnabled="False">Play!</Button>
-      <Button IsEnabled="False">Tournament</Button>
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Margin" Value="1"/>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Width="350">
+            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="20" Padding="10 10 10 0" DataContext="{Binding CurrentGame}"/>
+            <TextBlock Text="{Binding Description}"  Padding="10 10 10 5" TextWrapping="Wrap" DataContext="{Binding CurrentGame}"/>
+            <TextBlock Padding="10 0 10 5">Time Limit: <TextBox Text="{Binding TimeLimitInput}" Width="40"/> s</TextBlock>
+            <TextBlock Padding="10 0 10 5">Max Steps: <TextBox Text="{Binding MaxStepsInput}" Width="50"/></TextBlock>
+            <ListBox Name="playerList" ItemsSource="{Binding Players}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="{Binding Status}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="30 0 30 0" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+            <Button Click="selectPlayerHandler">Choose the player</Button>
+            <ToggleButton Width="200" Margin="1" Click="playHandler" IsChecked="{Binding Path=ToggleButtonPressed, Mode=OneWay}">
+                <ToggleButton.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}" Value="SelectPlayers">
+                                <Setter Property="ToggleButton.IsEnabled" Value="False" />
+                                <Setter Property="ToggleButton.Content" Value="Play!" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding State}" Value="Ready">
+                                <Setter Property="ToggleButton.IsEnabled" Value="True" />
+                                <Setter Property="ToggleButton.Content" Value="Play!" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding State}" Value="Running">
+                                <Setter Property="ToggleButton.IsEnabled" Value="True" />
+                                <Setter Property="ToggleButton.Content" Value="Cancel" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+            <Button IsEnabled="False">Tournament</Button>
+        </StackPanel>
+        <GroupBox Header="Log" Width="300">
+            <ListView ItemsSource="{Binding ElementName=playerList, Path=SelectedItem.Log}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Message}">
+                            <TextBlock.Style>
+                                <Style>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="JudgeToPlayer">
+                                            <Setter Property="TextBlock.Foreground" Value="Gray" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="PlayerToJudge">
+                                            <Setter Property="TextBlock.Foreground" Value="Black" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Error">
+                                            <Setter Property="TextBlock.Foreground" Value="Red" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Notification">
+                                            <Setter Property="TextBlock.Foreground" Value="CornflowerBlue" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RecordClass}" Value="Congratulation">
+                                            <Setter Property="TextBlock.Foreground" Value="DarkGoldenrod" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListView>
+        </GroupBox>
     </StackPanel>
-    <GroupBox Header="Log" Width="300">
-      <ListView ItemsSource="{Binding ElementName=playerList, Path=SelectedItem.Log}">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Message}">
-              <TextBlock.Style>
-                <Style>
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding RecordClass}" Value="JudgeToPlayer">
-                      <Setter Property="TextBlock.Foreground" Value="Gray" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding RecordClass}" Value="PlayerToJudge">
-                      <Setter Property="TextBlock.Foreground" Value="Black" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding RecordClass}" Value="Error">
-                      <Setter Property="TextBlock.Foreground" Value="Red" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding RecordClass}" Value="Notification">
-                      <Setter Property="TextBlock.Foreground" Value="CornflowerBlue" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding RecordClass}" Value="Congratulation">
-                      <Setter Property="TextBlock.Foreground" Value="DarkGoldenrod" />
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </TextBlock.Style>
-            </TextBlock>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListView>
-    </GroupBox>
-  </StackPanel>
 </UserControl>

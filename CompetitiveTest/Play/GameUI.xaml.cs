@@ -3,17 +3,23 @@
   using System;
   using System.Threading;
   using System.Globalization;
+  using System.ComponentModel;
   using System.Windows;
   using System.Windows.Controls;
   using Microsoft.Win32;
+  using System.Windows.Controls.Primitives;
 
-  public partial class GameUI : UserControl {
+  public partial class GameUI : UserControl, INotifyPropertyChanged {
 
     #region Fields
 
     private Game currentGame;
 
     private Player[] players;
+
+    private GameState state = GameState.SelectPlayers;
+
+    private Boolean toggleButtonPressed = false;
 
     #endregion
 
@@ -27,6 +33,37 @@
 
     public Player[] Players { get { return players; } }
 
+    public GameState State {
+      get {
+        return state;
+      }
+      set {
+        if (state != value) {
+          switch (state = value) {
+            case GameState.Running:
+              ToggleButtonPressed = true;
+              break;
+            default :
+              ToggleButtonPressed = false;
+              break;
+          }
+          RaisePropertyChanged("State");
+        }
+      }
+    }
+
+    public Boolean ToggleButtonPressed {
+      get {
+        return toggleButtonPressed;
+      }
+      set {
+        if (toggleButtonPressed != value) {
+          toggleButtonPressed = value;
+          RaisePropertyChanged("ToggleButtonPressed");
+        }
+      }
+    }
+
     #endregion
 
     #region Methods
@@ -37,6 +74,7 @@
       TimeLimitInput = "2.0";
       MaxStepsInput = "500";
       currentGame = new Games.GuessTheNumber();
+      currentGame.GameComplete += gameCompleteHandler;
       players = new Player[currentGame.Players];
       for (Int32 i = 0; i < currentGame.Players; ++i) {
         players[i] = new Player(Dispatcher);
@@ -44,14 +82,18 @@
       DataContext = this;
     }
 
-    private Boolean CheckPlayers() {
+    void gameCompleteHandler(Object sender, RunWorkerCompletedEventArgs e) {
+      State = GameState.Ready;
+    }
+
+    private void checkPlayers() {
       foreach (Player p in players) {
         if (p == null || !p.IsReady) {
-          playButton.IsEnabled = false;
-          return false;
+          State = GameState.SelectPlayers;
+          return;
         }
       }
-      return true;
+      State = GameState.Ready;
     }
 
     private void selectPlayerHandler(Object sender, RoutedEventArgs e) {
@@ -66,22 +108,42 @@
           }
         }
       }
-      playButton.IsEnabled = CheckPlayers();
+      checkPlayers();
     }
 
     private void playHandler(Object sender, RoutedEventArgs e) {
-      Int32 maxSteps;
-      Double timeLimitSeconds;
-      if (!Int32.TryParse(MaxStepsInput, out maxSteps)) {
-        MessageBox.Show("Wrong Max Steps format");
-      } else if (!Double.TryParse(TimeLimitInput, out timeLimitSeconds)) {
-        MessageBox.Show("Wrong Time Limit format " + TimeLimitInput);
-      } else if (CheckPlayers()) {
-        CurrentGame.BeginPlay(players, maxSteps, TimeSpan.FromSeconds(timeLimitSeconds));
+      ToggleButton button = sender as ToggleButton;
+      if (button.IsChecked.Value) {
+        Int32 maxSteps;
+        Double timeLimitSeconds;
+        if (!Int32.TryParse(MaxStepsInput, out maxSteps)) {
+          MessageBox.Show(String.Format("Wrong MaxSteps format: \"{0}\"", MaxStepsInput), "Can\'t run the game", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        } else if (!Double.TryParse(TimeLimitInput, out timeLimitSeconds)) {
+          MessageBox.Show(String.Format("Wrong Time Limit format: \"{0}\"", TimeLimitInput), "Can\'t run the game", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        } else {
+          checkPlayers();
+          if (state == GameState.Ready) {
+            CurrentGame.BeginPlay(players, maxSteps, TimeSpan.FromSeconds(timeLimitSeconds));
+            State = GameState.Running;
+          }
+        }
       } else {
-        playButton.IsEnabled = false;
+        currentGame.CalcelPlay();
+        State = GameState.Ready;
       }
     }
+
+    private void RaisePropertyChanged(String pname) {
+      if (PropertyChanged != null) {
+        PropertyChanged(this, new PropertyChangedEventArgs(pname));
+      }
+    }
+
+    #endregion
+
+    #region Events
+  
+    public event PropertyChangedEventHandler PropertyChanged;
 
     #endregion
 

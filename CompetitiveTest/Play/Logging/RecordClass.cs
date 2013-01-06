@@ -2,7 +2,7 @@
 
   using System;
 
-  public enum RecordClass : byte {
+  public enum RecordClass {
 
     Error = 1,
 
